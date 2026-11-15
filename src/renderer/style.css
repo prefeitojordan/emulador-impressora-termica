@@ -143,3 +143,6 @@ html, body {
   transition: opacity .2s, transform .2s; z-index: 5;
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.brand .meta { white-space: nowrap; }
+@media (max-width: 360px) { .brand .meta { display: none; } }

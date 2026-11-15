@@ -1,12 +1,13 @@
 {
   "name": "emulador-impressora-termica",
   "version": "1.0.0",
-  "description": "Emulador visual de impressora térmica ESC/POS (TCP 9100 + HTTP) com papel saindo no canto da tela",
+  "description": "Impressora térmica ESC/POS virtual para Windows: o cupom aparece no canto da tela com o papel subindo. TCP 9100, HTTP, QR Code, código de barras, NFC-e.",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "teste": "node exemplos/enviar-teste.js",
-    "dist": "electron-builder --win portable nsis"
+    "dist": "electron-builder --win portable nsis",
+    "capturas": "electron tools/capture.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -16,7 +17,8 @@
   },
   "devDependencies": {
     "electron": "^45.3.2",
-    "electron-builder": "^26.18.0"
+    "electron-builder": "^26.18.0",
+    "gifenc": "^1.0.3"
   },
   "author": "Maicon Rodrigues",
   "repository": {
@@ -47,5 +49,14 @@
     "directories": {
       "output": "dist"
     }
-  }
+  },
+  "keywords": [
+    "escpos",
+    "thermal-printer",
+    "impressora-termica",
+    "emulador",
+    "nfce",
+    "pdv",
+    "electron"
+  ]
 }
