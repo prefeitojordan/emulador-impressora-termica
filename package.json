@@ -5,13 +5,47 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "teste": "node exemplos/enviar-teste.js"
+    "teste": "node exemplos/enviar-teste.js",
+    "dist": "electron-builder --win portable nsis"
   },
   "license": "MIT",
   "dependencies": {
-    "electron": "^45.3.2",
     "iconv-lite": "^0.7.3",
     "jsbarcode": "^3.12.3",
     "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0"
+  },
+  "author": "Maicon Rodrigues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/prefeitojordan/emulador-impressora-termica.git"
+  },
+  "build": {
+    "appId": "emulador.impressora.termica",
+    "productName": "Emulador Impressora Termica",
+    "files": [
+      "src/**/*",
+      "package.json",
+      "node_modules/jsbarcode/dist/JsBarcode.all.min.js"
+    ],
+    "win": {
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-${version}-${arch}-${target}.${ext}"
+    },
+    "portable": {
+      "artifactName": "EmuladorImpressoraTermica-${version}-portatil.exe"
+    },
+    "nsis": {
+      "artifactName": "EmuladorImpressoraTermica-${version}-instalador.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Emulador Impressora Térmica"
+    },
+    "directories": {
+      "output": "dist"
+    }
   }
 }

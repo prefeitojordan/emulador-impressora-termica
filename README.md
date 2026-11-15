@@ -2,10 +2,21 @@
 
 Mostra uma impressora térmica no canto inferior direito da tela, com o papel **subindo** enquanto imprime. Use para testar sistemas (PDV, delivery, NFC-e, comandas) sem gastar bobina.
 
-## Como rodar
+## Download (Windows)
+
+Baixe na página de [Releases](https://github.com/prefeitojordan/emulador-impressora-termica/releases/latest):
+
+- **`EmuladorImpressoraTermica-x.y.z-instalador.exe`**: instala com atalho no menu Iniciar.
+- **`EmuladorImpressoraTermica-x.y.z-portatil.exe`**: roda direto, sem instalar.
+
+Os executáveis não têm assinatura digital, então o Windows SmartScreen pode mostrar "O Windows protegeu o computador". Clique em **Mais informações → Executar assim mesmo**.
+
+## Como rodar a partir do código
 
 ```
-iniciar.bat            (ou: npm start)
+npm install
+npm start              (ou: iniciar.bat)
+npm run dist           (gera os .exe em dist/)
 ```
 O app fica sempre por cima das outras janelas e deixa os cliques passarem nas áreas vazias. Ele também coloca um ícone na bandeja do Windows: clique para mostrar ou ocultar a impressora e use o botão direito para abrir o menu.
 
