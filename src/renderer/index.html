@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' file: data:; img-src 'self' file: data: blob:; style-src 'self' 'unsafe-inline' file:; script-src 'self' file:">
+  <title>Impressora Térmica Emulada</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="stage">
+    <div id="feed"></div>
+    <div id="toast"></div>
+    <div id="printer">
+      <div class="slot"><div class="cutter"></div></div>
+      <div class="shade"></div>
+      <div class="face">
+        <div class="brand">
+          <span class="led" id="led" title="Status"></span>
+          <span class="name">THERMAL&nbsp;EMU</span>
+          <span class="meta" id="meta">80mm</span>
+        </div>
+        <div class="buttons">
+          <button id="btnFeed" title="Avançar papel">⇡</button>
+          <button id="btnClear" title="Limpar papel">✕</button>
+          <button id="btnCollapse" title="Recolher/expandir papel">▾</button>
+          <button id="btnMenu" title="Menu / configurações">☰</button>
+        </div>
+      </div>
+      <div class="status" id="status">iniciando…</div>
+    </div>
+  </div>
+  <script src="../../node_modules/jsbarcode/dist/JsBarcode.all.min.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

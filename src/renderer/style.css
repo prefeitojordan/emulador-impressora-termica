@@ -1,0 +1,145 @@
+:root {
+  --scale: 0.6;
+  --paper-dots: 640;
+  --printable-dots: 576;
+  --paper-w: calc(var(--paper-dots) * var(--scale) * 1px);
+  --margin-w: calc((var(--paper-dots) - var(--printable-dots)) / 2 * var(--scale) * 1px);
+  --printer-h: 84px;
+  --tooth: 6px;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: transparent;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  user-select: none;
+}
+
+#stage { position: absolute; inset: 0; }
+
+/* ------------------------------------------------ coluna do papel */
+#feed {
+  position: absolute; left: 0; right: 0; top: 0;
+  bottom: calc(var(--printer-h) - 14px);
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column; align-items: center;
+  scrollbar-width: none;
+  transition: opacity .25s;
+}
+#feed::-webkit-scrollbar { display: none; }
+#stage.collapsed #feed { opacity: 0; pointer-events: none; }
+
+.receipt {
+  flex: none;
+  width: var(--paper-w);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .28)) drop-shadow(0 0 1px rgba(0, 0, 0, .25));
+}
+.receipt:first-child { margin-top: auto; }
+.receipt + .receipt { margin-top: 14px; }
+.receipt.cut:last-child { margin-bottom: 26px; }
+.receipt { transition: margin-bottom .35s ease-out; }
+
+.receipt .win { overflow: hidden; height: 0; }
+
+.paper {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.035), transparent 6%, transparent 94%, rgba(0,0,0,.035)),
+    #fbfaf6;
+  padding: 0 var(--margin-w);
+  padding-top: calc(16px * var(--scale) / .6);
+}
+.paper .content > canvas { display: block; width: 100%; }
+.paper .content > .notice {
+  margin: 4px 0; padding: 3px 6px; border: 1px dashed #b55;
+  color: #a33; font: 11px Consolas, monospace; text-align: center; word-break: break-all;
+}
+
+/* bordas rasgadas (picote) */
+.paper.torn-top {
+  padding-top: calc(var(--tooth) + 14px * var(--scale) / .6);
+  -webkit-mask:
+    conic-gradient(from 135deg at 50% 0, #000 90deg, #0000 0) top / calc(var(--tooth) * 2) var(--tooth) repeat-x,
+    linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--tooth) + .5px) no-repeat;
+}
+.paper.torn-bottom {
+  padding-bottom: calc(var(--tooth) + 6px);
+  -webkit-mask:
+    conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) bottom / calc(var(--tooth) * 2) var(--tooth) repeat-x,
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth) + .5px) no-repeat;
+}
+.paper.torn-top.torn-bottom {
+  -webkit-mask:
+    conic-gradient(from 135deg at 50% 0, #000 90deg, #0000 0) top / calc(var(--tooth) * 2) var(--tooth) repeat-x,
+    conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) bottom / calc(var(--tooth) * 2) var(--tooth) repeat-x,
+    linear-gradient(#000 0 0) center / 100% calc(100% - 2 * var(--tooth) + 1px) no-repeat;
+}
+
+.receipt.fresh { animation: settle .5s ease-out; }
+@keyframes settle { from { transform: translateY(4px); } to { transform: none; } }
+
+/* ------------------------------------------------ impressora */
+#printer {
+  position: absolute; bottom: 0; left: 50%;
+  width: calc(var(--paper-w) + 30px); height: var(--printer-h);
+  transform: translateX(-50%);
+}
+#printer .slot {
+  position: absolute; top: 0; left: 6px; right: 6px; height: 16px;
+  border-radius: 9px 9px 3px 3px;
+  background: linear-gradient(#3b3f48, #23262c 60%, #1a1c21);
+  box-shadow: 0 -1px 0 rgba(255,255,255,.08) inset, 0 2px 6px rgba(0,0,0,.35);
+}
+#printer .cutter {
+  position: absolute; left: 10px; right: 10px; top: 7px; height: 4px; border-radius: 2px;
+  background: #050507; box-shadow: 0 1px 0 rgba(255,255,255,.08);
+}
+#printer .shade {
+  position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+  width: var(--paper-w); height: 18px; pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,.22), transparent);
+}
+#printer .face {
+  position: absolute; top: 12px; left: 0; right: 0; bottom: 0;
+  border-radius: 10px 10px 4px 4px;
+  background: linear-gradient(180deg, #4a4f5a 0%, #353941 35%, #2a2d34 100%);
+  box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 6px 18px rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px 18px;
+}
+.brand { display: flex; align-items: center; gap: 8px; color: #c9ccd3; }
+.brand .name { font-weight: 700; font-size: 11px; letter-spacing: 2px; }
+.brand .meta { font-size: 10px; color: #8d929c; }
+.led {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #3ddc84; box-shadow: 0 0 6px #3ddc84;
+}
+.led.busy { background: #ffb020; box-shadow: 0 0 8px #ffb020; animation: blink .25s infinite alternate; }
+.led.error { background: #ff4d4f; box-shadow: 0 0 8px #ff4d4f; }
+@keyframes blink { to { opacity: .45; } }
+
+.buttons { display: flex; gap: 5px; }
+.buttons button {
+  width: 24px; height: 22px; border: none; border-radius: 5px; cursor: pointer;
+  background: linear-gradient(#5a5f6b, #3c4048); color: #e4e6ea; font-size: 12px; line-height: 1;
+  box-shadow: 0 1px 0 rgba(255,255,255,.15) inset, 0 1px 2px rgba(0,0,0,.4);
+}
+.buttons button:hover { background: linear-gradient(#6b717e, #474c55); }
+.buttons button:active { transform: translateY(1px); }
+#stage.collapsed #btnCollapse { transform: rotate(180deg); }
+
+#printer .status {
+  position: absolute; bottom: 4px; left: 0; right: 0; text-align: center;
+  font: 9.5px Consolas, monospace; color: #8d929c; white-space: nowrap; overflow: hidden;
+}
+#printer .status .bad { color: #ff7b7b; }
+
+/* ------------------------------------------------ avisos */
+#toast {
+  position: absolute; left: 50%; bottom: calc(var(--printer-h) + 10px);
+  transform: translate(-50%, 10px); opacity: 0; pointer-events: none;
+  background: rgba(20, 22, 26, .92); color: #fff; font-size: 12px;
+  padding: 6px 12px; border-radius: 14px; white-space: nowrap;
+  transition: opacity .2s, transform .2s; z-index: 5;
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }

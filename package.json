@@ -1,0 +1,17 @@
+{
+  "name": "emulador-impressora-termica",
+  "version": "1.0.0",
+  "description": "Emulador visual de impressora térmica ESC/POS (TCP 9100 + HTTP) com papel saindo no canto da tela",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "teste": "node exemplos/enviar-teste.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^45.3.2",
+    "iconv-lite": "^0.7.3",
+    "jsbarcode": "^3.12.3",
+    "qrcode": "^1.5.4"
+  }
+}
