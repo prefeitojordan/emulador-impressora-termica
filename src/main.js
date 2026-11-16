@@ -11,6 +11,11 @@ const { EscPosParser } = require('./escpos');
 const { buildTestReceipt } = require('./sample');
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+// A janela é transparente e deixa os cliques passarem; o Windows pode achar que ela está
+// encoberta e o Chromium pausaria a animação do papel. Desliga essas otimizações.
+app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-background-timer-throttling');
 if (!app.requestSingleInstanceLock()) { app.quit(); process.exit(0); }
 
 // ------------------------------------------------------------------ configuração
@@ -74,10 +79,13 @@ function createWindow() {
     show: false,
     title: 'Impressora Térmica Emulada',
     icon: makeIcon(),
-    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true },
+    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, backgroundThrottling: false },
   });
   win.setAlwaysOnTop(true, 'screen-saver');
   win.setIgnoreMouseEvents(true, { forward: true });
+  // se a página recarregar ou o renderer cair, volta a enfileirar até ela avisar que está pronta
+  win.webContents.on('did-start-loading', () => { rendererReady = false; });
+  win.webContents.on('render-process-gone', () => { rendererReady = false; win.webContents.reload(); });
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
   win.once('ready-to-show', () => win.showInactive());
 }
@@ -92,10 +100,22 @@ function pushStatus() {
   if (tray) { tray.setToolTip(`Impressora térmica emulada\nTCP ${cfg.tcpPort}: ${status.tcp}\nHTTP ${cfg.httpPort}: ${status.http}`); buildMenus(); }
 }
 
+// Jobs que chegam antes de a página da impressora carregar ficam na fila (antes eram perdidos).
+let rendererReady = false;
+let pendingOps = [];
+
 function sendOps(ops) {
-  if (!win || !ops.length) return;
+  if (!ops.length) return;
+  if (!win || !rendererReady) { pendingOps.push(...ops); return; }
   if (cfg.showOnPrint && !win.isVisible()) win.showInactive();
   win.webContents.send('ops', ops);
+}
+
+function flushPendingOps() {
+  if (!pendingOps.length) return;
+  const ops = pendingOps;
+  pendingOps = [];
+  sendOps(ops);
 }
 
 // ------------------------------------------------------------------ jobs
@@ -295,7 +315,7 @@ function makeIcon() {
 // ------------------------------------------------------------------ IPC
 
 ipcMain.on('ignore-mouse', (_e, v) => win && win.setIgnoreMouseEvents(!!v, { forward: true }));
-ipcMain.on('ready', () => { pushConfig(); pushStatus(); });
+ipcMain.on('ready', () => { pushConfig(); pushStatus(); rendererReady = true; flushPendingOps(); });
 ipcMain.on('open-menu', () => Menu.buildFromTemplate(menuTemplate()).popup({ window: win }));
 ipcMain.on('receipt-menu', (_e, { text, png }) => {
   Menu.buildFromTemplate([

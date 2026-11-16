@@ -1,6 +1,6 @@
 {
   "name": "emulador-impressora-termica",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Impressora térmica ESC/POS virtual para Windows: o cupom aparece no canto da tela com o papel subindo. TCP 9100, HTTP, QR Code, código de barras, NFC-e.",
   "main": "src/main.js",
   "scripts": {

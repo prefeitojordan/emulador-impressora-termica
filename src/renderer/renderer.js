@@ -239,9 +239,10 @@ function tick(now) {
   if (moving && stick) feedEl.scrollTop = feedEl.scrollHeight;
   led.classList.toggle('busy', moving);
   sound.motor(moving && cfg.sound);
-  requestAnimationFrame(tick);
 }
-requestAnimationFrame(tick);
+// Timer em vez de requestAnimationFrame: o rAF para quando o Windows considera a janela
+// encoberta, e o papel ficava "preso" com altura 0. O timer continua avançando.
+setInterval(() => tick(performance.now()), 16);
 
 feedEl.addEventListener('wheel', (e) => { if (e.deltaY < 0) stick = false; });
 feedEl.addEventListener('scroll', () => {
